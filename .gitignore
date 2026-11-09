@@ -1,0 +1,17 @@
+# Outputs
+stitch_outputs/
+
+# Open data archives
+open_data/*.zip
+open_data/**/*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+
