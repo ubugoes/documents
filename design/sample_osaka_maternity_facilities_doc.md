@@ -30,10 +30,13 @@ CSVには、1つの施設につき以下の項目が記録されています。
 * **施設名 (`name`)**: 病院やクリニックの正式名称
 * **所在区 (`ward`)**: 大阪市24区のどこにあるか（例: `都島区`, `浪速区`）
 * **住所 (`address`)**: 正確な所在地（地図表示やナビ用）
+* **緯度・経度 (`latitude` / `longitude`)**: マップ上にピンを表示するための座標データ（例: `34.7093`, `135.5276`）
 * **最寄り駅 (`nearest_station`)**: 一番近い駅（例: `都島駅`）
+* **駅からの徒歩分数 (`station_walk_minutes`)**: 最寄り駅から歩いて何分かかるかの数値（例: `3` ＝ 徒歩3分、`1` ＝ 駅直結・徒歩1分）
 * **乗り入れ沿線 (`lines`)**: 通っている電車の路線（例: 地下鉄谷町線、JR環状線）
 * **ホームページURL (`website_url`)**: 施設の公式Webサイト
 * **電話番号 (`phone_number`)**: 予約や問い合わせ先の電話番号
+* **診察時間・休診日 (`clinic_hours`)**: 外来の受付時間や休診日、夜間・土曜診療の有無（例: `月〜土 9:00-12:00 / 月水金 17:00-19:00（日祝休）`）
 * **紹介文 (`description`)**: どんな特徴があるかを100文字程度でまとめた解説
 
 ### ② どんな医療に対応できるか（安全とスタイル）
@@ -57,6 +60,7 @@ CSVには、1つの施設につき以下の項目が記録されています。
 * **個室があるか (`private_room_available`)**: まわりを気にせず休める個室のお部屋があるか。
 * **出産の費用目安 (`cost_estimate_min / max`)**: 普通分娩でだいたい何円〜何円くらいかかるかの目安数値（例: 45万円〜52万円）。
 * **費用のひとこと補足 (`cost_note`)**: 「国の出産一時金（50万円）でほぼ収まる」「無痛分娩はプラス10万円」などの分かりやすい注釈。
+* **分娩予約リミットの目安 (`booking_deadline_note`)**: 「妊娠8〜10週頃まで」「妊娠12〜16週頃まで（要紹介状）」など、いつまでに分娩予約・初診に動くべきかの目安。
 * **特徴キーワード (`medical_services`)**: 「NICU完備」「駅直結」「全室個室」「女医在籍」などの特徴タグ。
 
 ---
@@ -107,7 +111,7 @@ CSVには、1つの施設につき以下の項目が記録されています。
 
 ## 4. 完全データディクショナリ（型・許容値・バリデーション）
 
-CSVファイルの各カラムに関する厳密な技術仕様です。全20カラムで構成されます。
+CSVファイルの各カラムに関する厳密な技術仕様です。全25カラムで構成されます。
 
 | カラム名 (ヘッダー) | 型 | 必須 | 許容値 / フォーマット | バリデーション・説明 |
 |---|---|:---:|---|---|
@@ -116,10 +120,14 @@ CSVファイルの各カラムに関する厳密な技術仕様です。全20カ
 | `facility_type` | enum | ○ | `tertiary` \| `regional` \| `general` \| `clinic` \| `midwife` | 厚労省周産期医療体制コードに準拠した医療区分。 |
 | `ward` | string | ○ | 大阪市24区名 | `都島区`, `福島区`, `此花区`, `西区`, `港区`, `大正区`, `天王寺区`, `浪速区`, `西淀川区`, `東淀川区`, `東成区`, `生野区`, `旭区`, `城東区`, `阿倍野区`, `住吉区`, `東住吉区`, `西成区`, `淀川区`, `鶴見区`, `住之江区`, `平野区`, `北区`, `中央区` のいずれか。 |
 | `address` | string | ○ | 日本国内住所表記 | 都道府県から番地・ビル名まで記載。 |
+| `latitude` | float | ○ | `34.50` 〜 `34.80` | 施設所在地の北緯（WGS84測地系）。詳細画面等のマップピン表示用。 |
+| `longitude` | float | ○ | `135.35` 〜 `135.65` | 施設所在地の東経（WGS84測地系）。詳細画面等のマップピン表示用。 |
 | `nearest_station` | string | ○ | 駅名（〜駅） | 最寄り駅名称。オートコンプリート検索用インデックス。 |
+| `station_walk_minutes` | integer | ○ | 正の整数（分） | 最寄り駅からの徒歩所要時間（分）。例: `1`（駅直結・徒歩1分）, `3`（徒歩3分）。 |
 | `lines` | JSON array | ○ | `["路線名", ...]` | 文字列配列のJSON表現。例: `["OsakaMetro谷町線", "JR大阪環状線"]`。 |
 | `website_url` | string (URL) | ○ | `https?://[^\s]+` | 有効なWebサイトURL。 |
 | `phone_number` | string (TEL) | ○ | `^06-[0-9]{4}-[0-9]{4}$` | 市外局番（06）を含むハイフン区切り電話番号。 |
+| `clinic_hours` | string | ○ | 文字列 | 外来診察時間・休診日・予約制等の案内テキスト。 |
 | `description` | string | ○ | 文字列（50〜200文字） | UI詳細カード・ボトムシート表示用テキスト。 |
 | `high_risk_ready` | boolean | ○ | `true` \| `false` | MFICU保有、多胎・合併症管理体制の有無。 |
 | `delivery_available` | boolean | ○ | `true` \| `false` | 有床・分娩受入の有無。健診専門施設は `false`。 |
@@ -130,6 +138,7 @@ CSVファイルの各カラムに関する厳密な技術仕様です。全20カ
 | `cost_estimate_min` | integer | ○ | 非負整数 (円) | 自然分娩・標準泊数の概算費用下限。健診専門は `0`。 |
 | `cost_estimate_max` | integer | ○ | 非負整数 (円) | 自然分娩・標準泊数の概算費用上限。健診専門は `0`。 |
 | `cost_note` | string | - | 文字列 | 費用に関する特記事項（一時金との差額、無痛加算等）。 |
+| `booking_deadline_note` | string | ○ | 文字列 | 分娩予約リミットの目安（例: `妊娠8〜10週頃まで`, `分娩予約不要（妊婦健診随時受付）`）。 |
 | `medical_services` | JSON array | ○ | `["CODE", ...]` | 定数サービスコードの配列。下記マスタ参照。 |
 
 ### `medical_services` で使用する共通コード体系
@@ -137,6 +146,8 @@ CSVファイルの各カラムに関する厳密な技術仕様です。全20カ
 * `MFICU`: 母体胎児集中治療室あり
 * `24H_PAINLESS`: 24時間無痛分娩体制
 * `SCHEDULED_PAINLESS`: 計画無痛分娩（平日・予約制等）
+* `FREESTYLE_BIRTH`: フリースタイル分娩・アクティブバース対応
+* `MIDWIFE_BIRTH`: 助産院（助産師主導）分娩
 * `POSTPARTUM_CARE`: 大阪市産後ケア事業受託
 * `SEMI_OPEN_HOSPITAL`: セミオープン分娩受入側中核病院
 * `SEMI_OPEN_CLINIC`: セミオープン健診協力クリニック
@@ -192,79 +203,4 @@ export const getUniqueStations = (facilities: MaternityFacility[], query: string
     .filter(station => station.toLowerCase().includes(queryLower))
     .slice(0, 5); // 最大5件サジェスト
 };
-```
-
----
-
-## 6. TypeScript型定義 & CSVパーサー実装
-
-CSVを読み込んでアプリケーションのステートとして扱うための完全なコードスニペットです。
-
-```typescript
-// facilityTypes.ts
-export type FacilityType = 'tertiary' | 'regional' | 'general' | 'clinic' | 'midwife';
-export type PainlessMode = '24h' | 'scheduled' | 'none';
-
-export interface MaternityFacility {
-  id: string;
-  name: string;
-  facility_type: FacilityType;
-  ward: string;
-  address: string;
-  nearest_station: string;
-  lines: string[];
-  website_url: string;
-  phone_number: string;
-  description: string;
-  high_risk_ready: boolean;
-  delivery_available: boolean;
-  prenatal_care_available: boolean;
-  painless_mode: PainlessMode;
-  osaka_postpartum_care: boolean;
-  private_room_available: boolean;
-  cost_estimate_min: number;
-  cost_estimate_max: number;
-  cost_note: string;
-  medical_services: string[];
-}
-
-// csvParser.ts
-export function parseFacilityCsvRow(row: Record<string, any>): MaternityFacility {
-  const safeJsonParse = (val: any, fallback: any = []) => {
-    if (!val) return fallback;
-    if (Array.isArray(val)) return val;
-    try {
-      return JSON.parse(val);
-    } catch {
-      return fallback;
-    }
-  };
-
-  const toBoolean = (val: any): boolean => {
-    return val === 'true' || val === true || val === 1 || val === '1';
-  };
-
-  return {
-    id: String(row.id || ''),
-    name: String(row.name || ''),
-    facility_type: (row.facility_type || 'clinic') as FacilityType,
-    ward: String(row.ward || ''),
-    address: String(row.address || ''),
-    nearest_station: String(row.nearest_station || ''),
-    lines: safeJsonParse(row.lines, []),
-    website_url: String(row.website_url || ''),
-    phone_number: String(row.phone_number || ''),
-    description: String(row.description || ''),
-    high_risk_ready: toBoolean(row.high_risk_ready),
-    delivery_available: toBoolean(row.delivery_available),
-    prenatal_care_available: toBoolean(row.prenatal_care_available),
-    painless_mode: (row.painless_mode || 'none') as PainlessMode,
-    osaka_postpartum_care: toBoolean(row.osaka_postpartum_care),
-    private_room_available: toBoolean(row.private_room_available),
-    cost_estimate_min: Number(row.cost_estimate_min) || 0,
-    cost_estimate_max: Number(row.cost_estimate_max) || 0,
-    cost_note: String(row.cost_note || ''),
-    medical_services: safeJsonParse(row.medical_services, []),
-  };
-}
 ```
