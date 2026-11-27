@@ -1,7 +1,7 @@
 # 【正式データ仕様書】大阪市産科・分娩施設マスターデータ (`osaka_maternity_facilities.csv`)
 
 > **📌 旧仕様書からの移行について（Important）**
-> 本ドキュメントは、開発初期の仮想サンプル仕様書（[sample_osaka_maternity_facilities_doc.md](./sample_osaka_maternity_facilities_doc.md)）を置き換える**正式な後継データ仕様書**です。
+> 本ドキュメントは、開発初期の仮想サンプル仕様書（[sample_osaka_maternity_facilities_doc.md](../archived/sample_osaka_maternity_facilities_doc.md)）を置き換える**正式な後継データ仕様書**です。
 > 実在の公的調査データ（[ubunavi_osaka_integrated.csv](../data/ubunavi_osaka_integrated.csv)）および厚労省「医療情報ネット」オープンデータ（[osaka_extracted/](../osaka_extracted)）をもとに、バッチ処理（[build_osaka_maternity_facilities.mjs](../scripts/build_osaka_maternity_facilities.mjs)）によって生成される正規化済みCSV（[osaka_maternity_facilities.csv](../data/osaka_maternity_facilities.csv)）の仕様を定義します。
 
 > **📖 本ドキュメントの読み方**
@@ -23,7 +23,7 @@
 
 ### 1.2 旧サンプル仕様（理想フォーマット）との矛盾と解決方針
 
-実データ（[ubunavi_osaka_integrated.csv](../data/ubunavi_osaka_integrated.csv)）と初期サンプル仕様（[sample_osaka_maternity_facilities_doc.md](./sample_osaka_maternity_facilities_doc.md)）の間に生じた構造的ギャップを、**「客観的事実を捏造しない」「未確認を『なし』に誤変換しない」**という原則で以下の通り解決しました。
+実データ（[ubunavi_osaka_integrated.csv](../data/ubunavi_osaka_integrated.csv)）と初期サンプル仕様（[sample_osaka_maternity_facilities_doc.md](../archived/sample_osaka_maternity_facilities_doc.md)）の間に生じた構造的ギャップを、**「客観的事実を捏造しない」「未確認を『なし』に誤変換しない」**という原則で以下の通り解決しました。
 
 | ギャップ領域 | 旧サンプル仕様（理想） | 実データの現実と採用した解決方針 |
 | :--- | :--- | :--- |
